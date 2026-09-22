@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+echo "[STARTUP] Initializing directories on persistent volume..."
+mkdir -p data/raw data/processed data/models data/predictions
+
 echo "[STARTUP] Checking for existing trained models..."
 if [ ! -f "data/models/game_outcome_engine.joblib" ]; then
     echo "[COLD START] Seeding baseline database and training models..."

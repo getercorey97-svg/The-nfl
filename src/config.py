@@ -9,6 +9,10 @@ PROCESSED_DATA_DIR = DATA_DIR / "processed"
 MODEL_DIR = DATA_DIR / "models"
 PREDICTION_DIR = DATA_DIR / "predictions"
 
+# Ensure all directories exist dynamically on the mounted disk at runtime
+for directory in [RAW_DATA_DIR, PROCESSED_DATA_DIR, MODEL_DIR, PREDICTION_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
+
 # Historical Training Range and Current Operational Year
 START_YEAR = 2020
 CURRENT_YEAR = 2026
@@ -16,7 +20,7 @@ CURRENT_YEAR = 2026
 # Model Determinism
 RANDOM_STATE = 42
 
-# Exactly 20 Targeted Player Prop Markets and their statistical distribution types
+# 20 Targeted Player Prop Markets and their statistical distribution types
 PROP_CONFIG: Dict[str, Dict[str, str]] = {
     # Passing (6 Props)
     "passing_yards": {"type": "continuous", "distribution": "tweedie"},
