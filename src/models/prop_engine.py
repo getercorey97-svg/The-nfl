@@ -82,13 +82,19 @@ class PropPredictiveEngine:
                 logger.warning("Target %s not found in training frame; skipping.", target)
                 continue
 
-            y = prop_df[target].fillna(0.0)
+            y = prop_df[target].fillna(0.0).copy()
+            spec = PROP_CONFIG.get(target, {})
+
+            # Enforce non-negative bounds for distributions requiring y >= 0
+            if spec.get("distribution") in ["tweedie", "poisson"]:
+                y = np.maximum(y, 0.0)
+
             model = self._build_model_for_target(target)
             model.fit(X, y)
             self.models[target] = model
 
             # Calculate and store empirical residual standard error for continuous props
-            if PROP_CONFIG[target]["type"] == "continuous":
+            if spec.get("type") == "continuous":
                 preds = model.predict(X)
                 residual_std = float(np.std(y - preds))
                 self.rmse_residuals[target] = max(residual_std, 1.0)
@@ -110,28 +116,23 @@ class PropPredictiveEngine:
         results["market_line"] = line
 
         if spec["type"] == "binary":
-            # Direct probability output (e.g. Anytime TD)
             probs = model.predict_proba(X)[:, 1]
             results["expected_value"] = probs
             results["over_prob"] = probs
             results["under_prob"] = 1.0 - probs
         
         elif spec["distribution"] == "poisson":
-            # Poisson rate parameter lambda
             lambdas = np.maximum(model.predict(X), 0.001)
             results["expected_value"] = lambdas
-            # P(X > line) = 1 - PoissonCDF(floor(line))
             k = int(np.floor(line))
             under_probs = poisson.cdf(k, lambdas)
             results["under_prob"] = under_probs
             results["over_prob"] = 1.0 - under_probs
 
         else:
-            # Continuous Yardage (Gaussian-approximated Tweedie conditional distribution)
             means = np.maximum(model.predict(X), 0.0)
             results["expected_value"] = means
             sigma = self.rmse_residuals.get(prop_name, 10.0)
-            # Standardized z-score
             z = (line - means) / sigma
             under_probs = norm.cdf(z)
             results["under_prob"] = under_probs
