@@ -1,0 +1,2 @@
+season,week,audited_at_utc,total_games_audited,spread_mae,total_mae,moneyline_brier,moneyline_accuracy,spread_ats_win_rate,total_props_audited,props_over_under_accuracy
+2024,1,2026-09-22T01:42:57.226086+00:00,16,6.810583590210733,6.771005980543973,0.1565517153848362,87.5,62.5,60,10.0

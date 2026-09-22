@@ -1,3 +1,4 @@
+import gc
 import logging
 from typing import List, Optional
 import pandas as pd
@@ -16,7 +17,7 @@ PBP_REDUCED_COLUMNS = [
 ]
 
 class NFLDataLoader:
-    """Manages low-memory ingestion of raw NFL datasets."""
+    """Memory-optimized ingestion interface for NFLverse datasets."""
 
     def __init__(self, start_year: int = START_YEAR, end_year: int = CURRENT_YEAR):
         self.start_year = start_year
@@ -39,17 +40,24 @@ class NFLDataLoader:
             logger.info("Loading cached Play-by-Play dataset from: %s", cache_file)
             return pd.read_parquet(cache_file)
 
-        logger.info("Ingesting column-pruned Play-by-Play data for seasons: %s", target_seasons)
-        raw_pbp = nfl.load_pbp(target_seasons)
-        df = self._to_pandas(raw_pbp)
-        
-        # Retain only required modeling columns to keep memory usage under 250MB
-        present_cols = [c for c in PBP_REDUCED_COLUMNS if c in df.columns]
-        df = df[present_cols]
+        logger.info("Ingesting PBP season-by-season with instant column filtering: %s", target_seasons)
+        season_frames = []
 
-        df.to_parquet(cache_file, index=False, compression="snappy")
-        logger.info("Saved %d rows to %s", len(df), cache_file)
-        return df
+        # Process each year individually to keep peak RAM under 200MB
+        for yr in target_seasons:
+            logger.info("Fetching and pruning PBP season %d...", yr)
+            raw = nfl.load_pbp([yr])
+            df_yr = self._to_pandas(raw)
+            cols = [c for c in PBP_REDUCED_COLUMNS if c in df_yr.columns]
+            df_yr = df_yr[cols]
+            season_frames.append(df_yr)
+            del raw
+            gc.collect()
+
+        combined = pd.concat(season_frames, ignore_index=True)
+        combined.to_parquet(cache_file, index=False, compression="snappy")
+        logger.info("Saved %d total rows to %s", len(combined), cache_file)
+        return combined
 
     def load_player_stats(self, seasons: Optional[List[int]] = None, force_refresh: bool = False) -> pd.DataFrame:
         target_seasons = seasons or self.seasons

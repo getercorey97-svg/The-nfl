@@ -1,0 +1,92 @@
+season,week,category,item,pick,projected,line,actual,error,status
+2024,1,spread,BAL @ KC,KC (Edge: +7.0),4.0,3.0,7.0,3.0,won
+2024,1,spread,GB @ PHI,PHI (Edge: +9.3),7.3,2.0,5.0,2.3,won
+2024,1,total,GB @ PHI,OVER 49.5,51.9,49.5,63.0,11.1,won
+2024,1,spread,PIT @ ATL,ATL (Edge: +4.5),0.5,4.0,-8.0,8.5,lost
+2024,1,total,PIT @ ATL,UNDER 43.0,42.0,43.0,28.0,14.0,won
+2024,1,spread,ARI @ BUF,BUF (Edge: +15.7),9.2,6.5,6.0,3.2,lost
+2024,1,total,ARI @ BUF,OVER 46.0,52.3,46.0,62.0,9.7,won
+2024,1,spread,TEN @ CHI,CHI (Edge: +11.5),7.5,4.0,7.0,0.5,won
+2024,1,total,TEN @ CHI,OVER 43.0,46.2,43.0,41.0,5.2,lost
+2024,1,spread,NE @ CIN,CIN (Edge: +12.3),4.3,8.0,-6.0,10.3,lost
+2024,1,total,NE @ CIN,OVER 40.5,42.2,40.5,26.0,16.2,lost
+2024,1,spread,HOU @ IND,HOU (Edge: -6.5),-3.5,-3.0,-2.0,1.5,lost
+2024,1,total,HOU @ IND,UNDER 49.0,47.3,49.0,56.0,8.7,lost
+2024,1,spread,JAX @ MIA,MIA (Edge: +6.3),2.8,3.5,3.0,0.2,lost
+2024,1,total,JAX @ MIA,UNDER 49.5,46.5,49.5,37.0,9.5,won
+2024,1,spread,CAR @ NO,NO (Edge: +16.2),12.7,3.5,37.0,24.3,won
+2024,1,total,CAR @ NO,OVER 41.5,49.0,41.5,57.0,8.0,won
+2024,1,spread,MIN @ NYG,MIN (Edge: -3.5),-2.5,-1.0,-22.0,19.5,won
+2024,1,total,MIN @ NYG,UNDER 42.5,37.1,42.5,34.0,3.1,won
+2024,1,spread,LV @ LAC,LAC (Edge: +6.2),3.2,3.0,12.0,8.8,won
+2024,1,total,LV @ LAC,UNDER 41.0,37.3,41.0,32.0,5.3,won
+2024,1,spread,DEN @ SEA,SEA (Edge: +13.0),6.5,6.5,6.0,0.5,lost
+2024,1,total,DEN @ SEA,OVER 42.0,46.0,42.0,46.0,0.0,won
+2024,1,spread,DAL @ CLE,DAL (Edge: -0.1),-2.6,2.5,-16.0,13.4,won
+2024,1,total,DAL @ CLE,OVER 42.0,47.5,42.0,50.0,2.5,won
+2024,1,spread,WAS @ TB,TB (Edge: +11.9),7.9,4.0,17.0,9.1,won
+2024,1,total,WAS @ TB,OVER 42.0,49.0,42.0,57.0,8.0,won
+2024,1,spread,LA @ DET,DET (Edge: +10.1),5.1,5.0,6.0,0.9,won
+2024,1,total,LA @ DET,UNDER 54.0,49.7,54.0,46.0,3.7,won
+2024,1,spread,NYJ @ SF,SF (Edge: +13.7),10.2,3.5,13.0,2.8,won
+2024,1,total,NYJ @ SF,OVER 43.0,48.9,43.0,51.0,2.1,won
+2024,1,prop,A.Rodgers (passing_yards),OVER 121.3 (P=0.99),159.1,121.3,167.0,7.9,won
+2024,1,prop,A.Rodgers (rushing_yards),OVER 4.0 (P=0.68),8.2,4.0,-1.0,9.2,lost
+2024,1,prop,A.Rodgers (receiving_yards),OVER 0.0 (P=0.50),0.0,0.0,0.0,0.0,push
+2024,1,prop,M.Prater (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,M.Prater (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,M.Prater (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,N.Folk (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,N.Folk (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,N.Folk (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,C.Campbell (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,C.Campbell (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,C.Campbell (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,M.Stafford (passing_yards),UNDER 337.3 (P=0.00),261.4,337.3,317.0,55.6,won
+2024,1,prop,M.Stafford (rushing_yards),OVER -1.7 (P=0.65),1.6,-1.7,0.0,1.6,won
+2024,1,prop,M.Stafford (receiving_yards),OVER 0.0 (P=0.50),0.0,0.0,0.0,0.0,push
+2024,1,prop,G.Gano (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,G.Gano (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,G.Gano (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,T.Morstead (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,T.Morstead (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,T.Morstead (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,B.Graham (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,B.Graham (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,B.Graham (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,V.Miller (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,V.Miller (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,V.Miller (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,C.Jordan (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,C.Jordan (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,C.Jordan (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,Ca.Heyward (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,Ca.Heyward (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,Ca.Heyward (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,A.Dalton (passing_yards),OVER 177.3 (P=0.83),193.2,177.3,0.0,193.2,lost
+2024,1,prop,A.Dalton (rushing_yards),OVER 4.7 (P=0.63),7.7,4.7,0.0,7.7,lost
+2024,1,prop,A.Dalton (receiving_yards),OVER 0.0 (P=0.50),0.0,0.0,0.0,0.0,push
+2024,1,prop,T.Taylor (passing_yards),UNDER 249.7 (P=0.00),190.9,249.7,36.0,154.9,won
+2024,1,prop,T.Taylor (rushing_yards),UNDER 33.0 (P=0.10),21.8,33.0,7.0,14.8,won
+2024,1,prop,T.Taylor (receiving_yards),OVER 0.0 (P=0.50),0.0,0.0,0.0,0.0,push
+2024,1,prop,J.Hekker (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,J.Hekker (rushing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,J.Hekker (receiving_yards),OVER 0.0 (P=0.50),0.1,0.0,0.0,0.1,push
+2024,1,prop,C.Hughlett (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,C.Hughlett (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,C.Hughlett (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,B.Wagner (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,B.Wagner (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,B.Wagner (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,S.Gilmore (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,S.Gilmore (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,S.Gilmore (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,L.David (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,L.David (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,L.David (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,J.Tucker (passing_yards),OVER 0.0 (P=0.51),0.2,0.0,0.0,0.2,push
+2024,1,prop,J.Tucker (rushing_yards),OVER 0.0 (P=0.51),0.1,0.0,0.0,0.1,push
+2024,1,prop,J.Tucker (receiving_yards),OVER 0.0 (P=0.51),0.3,0.0,0.0,0.3,push
+2024,1,prop,K.Cousins (passing_yards),UNDER 277.7 (P=0.00),232.0,277.7,155.0,77.0,won
+2024,1,prop,K.Cousins (rushing_yards),OVER 1.0 (P=0.66),4.6,1.0,0.0,4.6,lost
+2024,1,prop,K.Cousins (receiving_yards),OVER 0.0 (P=0.50),0.0,0.0,0.0,0.0,push
