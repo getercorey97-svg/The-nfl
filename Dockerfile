@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Install system dependencies for LightGBM and compilers
+# Install runtime libraries for LightGBM
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libgomp1 \
@@ -17,15 +17,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy source, pipelines, and configuration
+# Copy source code, scripts, and bundled datasets/models
 COPY src/ ./src/
 COPY scripts/ ./scripts/
+COPY data/ ./data_bundled/
 
-# Create data directories
-RUN mkdir -p data/raw data/processed data/models data/predictions
+# Ensure start script is executable
+RUN chmod +x ./scripts/render_start.sh
 
-# Expose production port
 EXPOSE 8000
 
-# Start production ASGI server
 CMD ["./scripts/render_start.sh"]

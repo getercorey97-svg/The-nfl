@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
-echo "[STARTUP] Initializing directories on persistent disk..."
+echo "[STARTUP] Initializing directory hierarchy on persistent disk..."
 mkdir -p data/raw data/processed data/models data/predictions
 
-echo "[STARTUP] Starting Uvicorn API server on port ${PORT:-8000}..."
+if [ -d "data_bundled" ]; then
+    echo "[STARTUP] Syncing bundled models and datasets to persistent volume..."
+    cp -rn data_bundled/* data/ 2>/dev/null || cp -r data_bundled/* data/ || true
+fi
+
+echo "[STARTUP] Verifying model artifacts..."
+if [ -f "data/models/game_outcome_engine.joblib" ]; then
+    echo "[STARTUP] Confirmed: game_outcome_engine.joblib is ready."
+else
+    echo "[WARNING] game_outcome_engine.joblib missing on disk. Generating fallback models..."
+    python scripts/train_models.py || true
+fi
+
+echo "[STARTUP] Starting Uvicorn on port ${PORT:-8000}..."
 exec uvicorn src.api.app:app --host 0.0.0.0 --port "${PORT:-8000}"
