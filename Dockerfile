@@ -17,12 +17,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy source code, scripts, and bundled datasets/models
+# Copy application source, scripts, and pre-trained models
 COPY src/ ./src/
 COPY scripts/ ./scripts/
 COPY data/ ./data_bundled/
 
-# Ensure start script is executable
 RUN chmod +x ./scripts/render_start.sh
 
 EXPOSE 8000
