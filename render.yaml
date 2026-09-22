@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nfl-prediction-engine
+    env: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    disk:
+      name: nfl-data-volume
+      mountPath: /app/data
+      sizeGB: 10
