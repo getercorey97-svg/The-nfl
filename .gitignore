@@ -11,19 +11,11 @@ __pycache__/
 *.so
 .pytest_cache/
 
-# Data artifacts (Parquet caches stay local / on persistent volume)
+# Raw play-by-play cache stays out of Git
 data/raw/*
-data/processed/*
-data/models/*.joblib
-data/predictions/*
 !data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/models/.gitkeep
-!data/predictions/.gitkeep
 
-# Environment variables
+# Environment variables & OS files
 .env
-
-# OS files
 .DS_Store
 Thumbs.db
