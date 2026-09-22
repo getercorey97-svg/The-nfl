@@ -18,7 +18,7 @@ logger = logging.getLogger("ProductionAPI")
 app = FastAPI(
     title="NFL Autonomous Prediction Engine",
     description="State-of-the-Art NFL Game Outcome and 20-Player Prop Modeling Platform",
-    version="1.1.0"
+    version="1.2.0"
 )
 
 app.add_middleware(
@@ -61,8 +61,16 @@ def get_latest_game_predictions(season: int = 2026, week: Optional[int] = None):
 
     df = pd.read_parquet(game_matrix_path)
     filtered = df[df["season"] == season]
-    if week is not None:
-        filtered = filtered[filtered["week"] == week]
+
+    # If no specific week is requested, find the earliest upcoming week with unplayed games
+    if week is None:
+        unplayed = filtered[filtered["home_score"].isna()]
+        if not unplayed.empty:
+            week = int(unplayed["week"].min())
+        else:
+            week = int(filtered["week"].max()) if not filtered.empty else 1
+
+    filtered = filtered[filtered["week"] == week]
 
     if filtered.empty:
         return []
@@ -129,21 +137,35 @@ def serve_dashboard():
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-slate-950 text-slate-100 min-h-screen">
-        <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4 flex justify-between items-center">
+        <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4 flex flex-wrap justify-between items-center gap-4">
             <h1 class="text-xl font-bold tracking-tight text-emerald-400">NFL Prediction Engine</h1>
-            <div class="flex space-x-4 text-sm font-medium">
-                <button onclick="showTab('games')" class="hover:text-emerald-400 px-3 py-1">Game Forecaster</button>
-                <button onclick="showTab('audit')" class="hover:text-emerald-400 px-3 py-1">Weekly Summary</button>
-                <button onclick="showTab('details')" class="hover:text-emerald-400 px-3 py-1">Pick Grader (Hits & Misses)</button>
+            <div class="flex space-x-2 text-sm font-medium">
+                <button onclick="showTab('games')" id="tab-btn-games" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400">Forecaster</button>
+                <button onclick="showTab('audit')" id="tab-btn-audit" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Weekly Summary</button>
+                <button onclick="showTab('details')" id="tab-btn-details" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Pick Grader</button>
             </div>
         </nav>
 
         <main class="max-w-7xl mx-auto p-6">
             <!-- Game Predictions Section -->
             <section id="section-games">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Upcoming Game Projections & Edges</h2>
-                    <button onclick="loadGames()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">Refresh Board</button>
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Game Projections & Market Edges</h2>
+                    <div class="flex items-center space-x-3 text-sm">
+                        <select id="select-season" onchange="loadGames()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white">
+                            <option value="2026" selected>2026 Season</option>
+                            <option value="2025">2025 Season</option>
+                            <option value="2024">2024 Season</option>
+                        </select>
+                        <select id="select-week" onchange="loadGames()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white">
+                            <option value="3" selected>Week 3</option>
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="4">Week 4</option>
+                            <option value="5">Week 5</option>
+                        </select>
+                        <button onclick="loadGames()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg font-semibold">Refresh</button>
+                    </div>
                 </div>
                 <div id="games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
@@ -170,18 +192,18 @@ def serve_dashboard():
                 </div>
             </section>
 
-            <!-- Detailed Pick Breakdown (Hits & Misses) -->
+            <!-- Detailed Pick Breakdown -->
             <section id="section-details" class="hidden">
                 <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl font-bold">Pick-by-Pick Performance Ledger</h2>
                     <div class="flex space-x-3 text-sm">
-                        <select id="filter-status" onchange="loadDetails()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg">
+                        <select id="filter-status" onchange="loadDetails()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white">
                             <option value="">All Outcomes</option>
                             <option value="won">Hits (Won)</option>
                             <option value="lost">Misses (Lost)</option>
                             <option value="push">Pushes</option>
                         </select>
-                        <select id="filter-category" onchange="loadDetails()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg">
+                        <select id="filter-category" onchange="loadDetails()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white">
                             <option value="">All Markets</option>
                             <option value="spread">Spreads</option>
                             <option value="total">Totals</option>
@@ -216,71 +238,95 @@ def serve_dashboard():
                 document.getElementById('section-games').classList.toggle('hidden', tab !== 'games');
                 document.getElementById('section-audit').classList.toggle('hidden', tab !== 'audit');
                 document.getElementById('section-details').classList.toggle('hidden', tab !== 'details');
+
+                ['games', 'audit', 'details'].forEach(t => {
+                    const btn = document.getElementById('tab-btn-' + t);
+                    if (t === tab) {
+                        btn.className = 'px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-semibold';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white';
+                    }
+                });
+
                 if (tab === 'games') loadGames();
                 if (tab === 'audit') loadAudit();
                 if (tab === 'details') loadDetails();
             }
 
             async function loadGames() {
-                const res = await fetch('/api/predictions/games?season=2024&week=2');
-                const games = await res.json();
+                const season = document.getElementById('select-season').value;
+                const week = document.getElementById('select-week').value;
                 const container = document.getElementById('games-container');
-                container.innerHTML = '';
-                
-                if (games.length === 0) {
-                    container.innerHTML = '<p class="text-slate-500 col-span-full">No active game fixtures found.</p>';
-                    return;
-                }
+                container.innerHTML = '<p class="text-slate-500 col-span-full">Loading projections...</p>';
 
-                games.forEach(g => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg';
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
-                            <span>WEEK ${g.week}</span>
-                            <span>SPREAD: ${g.spread_line}</span>
-                        </div>
-                        <div class="text-lg font-bold mb-4">${g.away_team} @ ${g.home_team}</div>
-                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-3 rounded-lg mb-3">
-                            <div>Proj Margin: <span class="font-bold ${g.pred_margin > 0 ? 'text-emerald-400' : 'text-rose-400'}">${g.pred_margin.toFixed(1)}</span></div>
-                            <div>Proj Total: <span class="font-bold text-sky-400">${g.pred_total.toFixed(1)}</span></div>
-                            <div>Home Win: <span class="font-bold">${(g.home_win_prob * 100).toFixed(1)}%</span></div>
-                            <div>Away Win: <span class="font-bold">${(g.away_win_prob * 100).toFixed(1)}%</span></div>
-                        </div>
-                        <div class="text-xs font-semibold ${Math.abs(g.spread_edge) > 1.5 ? 'text-emerald-400' : 'text-slate-500'}">
-                            Edge: ${g.spread_edge > 0 ? '+' : ''}${g.spread_edge.toFixed(1)} pts
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
+                try {
+                    const res = await fetch(`/api/predictions/games?season=${season}&week=${week}`);
+                    if (!res.ok) throw new Error('API returned status ' + res.status);
+                    const games = await res.json();
+                    container.innerHTML = '';
+                    
+                    if (!Array.isArray(games) || games.length === 0) {
+                        container.innerHTML = `<p class="text-slate-500 col-span-full">No active fixtures found for Season ${season} Week ${week}.</p>`;
+                        return;
+                    }
+
+                    games.forEach(g => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg';
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+                                <span>WEEK ${g.week}</span>
+                                <span>SPREAD: ${g.spread_line}</span>
+                            </div>
+                            <div class="text-lg font-bold mb-4">${g.away_team} @ ${g.home_team}</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-3 rounded-lg mb-3">
+                                <div>Proj Margin: <span class="font-bold ${g.pred_margin > 0 ? 'text-emerald-400' : 'text-rose-400'}">${g.pred_margin.toFixed(1)}</span></div>
+                                <div>Proj Total: <span class="font-bold text-sky-400">${g.pred_total.toFixed(1)}</span></div>
+                                <div>Home Win: <span class="font-bold">${(g.home_win_prob * 100).toFixed(1)}%</span></div>
+                                <div>Away Win: <span class="font-bold">${(g.away_win_prob * 100).toFixed(1)}%</span></div>
+                            </div>
+                            <div class="text-xs font-semibold ${Math.abs(g.spread_edge) > 1.5 ? 'text-emerald-400' : 'text-slate-500'}">
+                                Edge: ${g.spread_edge > 0 ? '+' : ''}${g.spread_edge.toFixed(1)} pts
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } catch (err) {
+                    container.innerHTML = `<p class="text-rose-500 col-span-full">Failed to load games: ${err.message}</p>`;
+                }
             }
 
             async function loadAudit() {
-                const res = await fetch('/api/audit');
-                const logs = await res.json();
                 const tbody = document.getElementById('audit-table-body');
-                tbody.innerHTML = '';
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">Loading audit summaries...</td></tr>';
+                try {
+                    const res = await fetch('/api/audit');
+                    const logs = await res.json();
+                    tbody.innerHTML = '';
 
-                if (logs.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">No empirical weekly summaries available yet.</td></tr>';
-                    return;
+                    if (!Array.isArray(logs) || logs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">No empirical weekly summaries available yet.</td></tr>';
+                        return;
+                    }
+
+                    logs.forEach(l => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-slate-800/50';
+                        row.innerHTML = `
+                            <td class="p-4">${l.season}</td>
+                            <td class="p-4">${l.week}</td>
+                            <td class="p-4">${l.total_games_audited}</td>
+                            <td class="p-4 font-mono">${l.spread_mae.toFixed(2)}</td>
+                            <td class="p-4 font-semibold ${l.spread_ats_win_rate >= 52.4 ? 'text-emerald-400' : 'text-rose-400'}">${l.spread_ats_win_rate.toFixed(1)}%</td>
+                            <td class="p-4 font-mono">${l.moneyline_brier.toFixed(4)}</td>
+                            <td class="p-4">${l.moneyline_accuracy.toFixed(1)}%</td>
+                            <td class="p-4">${l.props_over_under_accuracy.toFixed(1)}%</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch (err) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-500">Failed to load summaries: ${err.message}</td></tr>`;
                 }
-
-                logs.forEach(l => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-slate-800/50';
-                    row.innerHTML = `
-                        <td class="p-4">${l.season}</td>
-                        <td class="p-4">${l.week}</td>
-                        <td class="p-4">${l.total_games_audited}</td>
-                        <td class="p-4 font-mono">${l.spread_mae.toFixed(2)}</td>
-                        <td class="p-4 font-semibold ${l.spread_ats_win_rate >= 52.4 ? 'text-emerald-400' : 'text-rose-400'}">${l.spread_ats_win_rate.toFixed(1)}%</td>
-                        <td class="p-4 font-mono">${l.moneyline_brier.toFixed(4)}</td>
-                        <td class="p-4">${l.moneyline_accuracy.toFixed(1)}%</td>
-                        <td class="p-4">${l.props_over_under_accuracy.toFixed(1)}%</td>
-                    `;
-                    tbody.appendChild(row);
-                });
             }
 
             async function loadDetails() {
@@ -290,40 +336,46 @@ def serve_dashboard():
                 if (status) params.append('status', status);
                 if (category) params.append('category', category);
 
-                const res = await fetch('/api/audit/details?' + params.toString());
-                const picks = await res.json();
                 const tbody = document.getElementById('details-table-body');
-                tbody.innerHTML = '';
+                tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500">Loading detailed ledger...</td></tr>';
 
-                if (picks.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500">No individual picks found matching criteria.</td></tr>';
-                    return;
-                }
+                try {
+                    const res = await fetch('/api/audit/details?' + params.toString());
+                    const picks = await res.json();
+                    tbody.innerHTML = '';
 
-                picks.forEach(p => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-slate-800/50';
-                    
-                    let statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-400">PUSH</span>';
-                    if (p.status === 'won') {
-                        statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">HIT</span>';
-                    } else if (p.status === 'lost') {
-                        statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-950 text-rose-400 border border-rose-800">MISS</span>';
+                    if (!Array.isArray(picks) || picks.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500">No individual picks found matching criteria.</td></tr>';
+                        return;
                     }
 
-                    row.innerHTML = `
-                        <td class="p-4">${statusBadge}</td>
-                        <td class="p-4">W${p.week}</td>
-                        <td class="p-4 uppercase text-xs font-semibold text-slate-400">${p.category}</td>
-                        <td class="p-4 font-semibold">${p.item}</td>
-                        <td class="p-4 font-mono text-sky-400">${p.pick}</td>
-                        <td class="p-4 font-mono">${p.projected}</td>
-                        <td class="p-4 font-mono text-slate-400">${p.line}</td>
-                        <td class="p-4 font-mono font-bold">${p.actual}</td>
-                        <td class="p-4 font-mono text-slate-400">${p.error}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
+                    picks.forEach(p => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-slate-800/50';
+                        
+                        let statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-400">PUSH</span>';
+                        if (p.status === 'won') {
+                            statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">HIT</span>';
+                        } else if (p.status === 'lost') {
+                            statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-950 text-rose-400 border border-rose-800">MISS</span>';
+                        }
+
+                        row.innerHTML = `
+                            <td class="p-4">${statusBadge}</td>
+                            <td class="p-4">W${p.week}</td>
+                            <td class="p-4 uppercase text-xs font-semibold text-slate-400">${p.category}</td>
+                            <td class="p-4 font-semibold">${p.item}</td>
+                            <td class="p-4 font-mono text-sky-400">${p.pick}</td>
+                            <td class="p-4 font-mono">${p.projected}</td>
+                            <td class="p-4 font-mono text-slate-400">${p.line}</td>
+                            <td class="p-4 font-mono font-bold">${p.actual}</td>
+                            <td class="p-4 font-mono text-slate-400">${p.error}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch (err) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500">Failed to load details: ${err.message}</td></tr>`;
+                }
             }
 
             loadGames();
