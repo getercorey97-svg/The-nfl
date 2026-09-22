@@ -1,0 +1,53 @@
+name: Weekly NFL Engine Ingestion, Audit, and Prediction Cron
+
+on:
+  schedule:
+    # Runs at 09:00 UTC (04:00 AM ET) every Tuesday
+    - cron: '0 9 * * 2'
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'NFL Season'
+        required: true
+        default: '2026'
+      prev_week:
+        description: 'Completed Week to Audit'
+        required: true
+        default: '2'
+      next_week:
+        description: 'Upcoming Week to Predict'
+        required: true
+        default: '3'
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Weekly Automation Pipeline
+        run: |
+          python scripts/run_weekly_pipeline.py \
+            --season ${{ github.event.inputs.season || '2026' }} \
+            --prev-week ${{ github.event.inputs.prev_week || '2' }} \
+            --next-week ${{ github.event.inputs.next_week || '3' }}
+
+      - name: Commit and push updated models, forecasts, and audit ledgers
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "NFL Automated Pipeline Engine"
+          git add data/models/ data/predictions/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(pipeline): automated weekly post-mortem audit and prediction update [skip ci]" && git push origin main)
